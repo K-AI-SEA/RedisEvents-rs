@@ -18,7 +18,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -63,7 +63,7 @@ jobs:
     # Compares the public API with the latest version on crates.io and fails on an unannounced break.
     # Before the first publish there is nothing to compare against, so the check skips (green) instead
     # of failing; it starts gating by itself once `redisevents` exists on crates.io.
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
     steps:
       - uses: actions/checkout@v4
       - name: Is there a published baseline?
@@ -92,7 +92,7 @@ jobs:
           exclude: interop-rust-host,inventory-domain,inventory-command,inventory-views,redisevents-test-support
 
   wire-drift:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -153,7 +153,7 @@ jobs:
 
   sample-matrix:
     name: sample-matrix (inventory interop)
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -174,7 +174,7 @@ jobs:
     # Nothing is published unless all of CI is green, the interop legs above all.
     needs: [lint, test, semver-checks, wire-drift, interop, sample-matrix]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
     environment: production
     permissions:
       contents: write
