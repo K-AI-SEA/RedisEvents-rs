@@ -63,7 +63,8 @@ jobs:
     # Compares the public API with the latest version on crates.io and fails on an unannounced break.
     # Before the first publish there is nothing to compare against, so the check skips (green) instead
     # of failing; it starts gating by itself once `redisevents` exists on crates.io.
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
+    # Box runners: semver-checks needs glibc >= 2.34, sample-matrix needs localhost ports.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Is there a published baseline?
@@ -153,7 +154,8 @@ jobs:
 
   sample-matrix:
     name: sample-matrix (inventory interop)
-    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || 'lode-ci' }}
+    # Box runners: semver-checks needs glibc >= 2.34, sample-matrix needs localhost ports.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
