@@ -5,6 +5,13 @@ and the crates follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed: StackExchange.Redis command-map entries in a connection string
+
+- `connection::stackexchange::to_redis_url` now ignores `$COMMAND=` / `$COMMAND=NEWNAME` options (e.g. `$SELECT=`,
+  which stops the C# client sending `SELECT` before every ad-hoc command). They shape the C# client only; before
+  this they were refused as unsupported, so a connection string shared with a C# service could not carry one. A bare
+  `$` key is still refused.
+
 ### Added: `STREAMS_HASH_TAG=false` for single-instance Redis
 
 - `Keys::from_env`/`from_lookup` now also read `STREAMS_HASH_TAG`: on unless the value is a falsey word

@@ -130,6 +130,9 @@ fn parse_inner(connection_string: &str) -> std::result::Result<ParsedConnection,
                 })?);
             }
             k if IGNORED_KEYS.contains(&k) => {}
+            // `$COMMAND=` / `$COMMAND=NEWNAME` renames or disables a command in the C# client's
+            // command map (e.g. `$SELECT=`); it shapes that client only, so it is ignored here.
+            k if k.len() > 1 && k.starts_with('$') => {}
             _ => return Err(format!("unsupported option '{}'", raw_key.trim())),
         }
     }
@@ -295,6 +298,18 @@ mod tests {
         let info = redis::IntoConnectionInfo::into_connection_info(url.as_str())
             .expect("the URL parses in redis-rs");
         assert_eq!(info.redis_settings().password(), Some(password));
+    }
+
+    #[test]
+    fn command_map_entries_are_ignored() {
+        let url = to_redis_url("redis-db:6379,abortConnect=false,$SELECT=,$INFO=INFO2").unwrap();
+        assert_eq!(url, "redis://redis-db:6379/0");
+    }
+
+    #[test]
+    fn a_bare_dollar_key_is_refused() {
+        let err = to_redis_url("redis-db:6379,$=x").unwrap_err().to_string();
+        assert!(err.contains("unsupported option '$'"), "{err}");
     }
 
     #[test]
